@@ -1,6 +1,6 @@
 const knownDomains = [
-   "hm.com", "zara.com", "uniqlo.com", "gap.com", "oldnavy.com", "oldnavy.gap.com",
-  "target.com", "walmart.com", "kohls.com", "macys.com", "jcpenney.com",
+   "hm.com", "zara.com", "uniqlo.com", "gap.com", "oldnavy.com", "oldnavy.gap.com","clubllondon.us",
+  "target.com", "walmart.com", "kohls.com", "macys.com", "jcpenney.com","levi.com",
   "nordstrom.com", "bloomingdales.com", "urbanoutfitters.com", "forever21.com",
   "express.com", "jcrew.com", "abercrombie.com", "aeropostale.com", "bananaRepublic.com",
   "annTaylor.com", "loft.com", "madewell.com", "landsend.com", "eddiebauer.com",
@@ -10,7 +10,7 @@ const knownDomains = [
   "yoox.com", "theoutnet.com", "matchesfashion.com", "mytheresa.com", "net-a-porter.com",
   "renttherunway.com", "nike.com", "adidas.com", "reebok.com", "puma.com", "newbalance.com",
   "converse.com", "vans.com", "underarmour.com", "asics.com", "champion.com", "fila.com",
-  "footlocker.com", "finishline.com", "eastbay.com", "stockx.com", "goat.com",
+  "footlocker.com", "finishline.com", "eastbay.com", "stockx.com", "goat.com","na-kd.com",
   "flightclub.com", "stadiumgoods.com", "hoka.com", "on-running.com", "allbirds.com",
   "lululemon.com", "gymshark.com", "aloYoga.com", "amazon.com", "ebay.com", "etsy.com",
   "aliexpress.com", "poshmark.com", "thredup.com", "depop.com", "grailed.com",
@@ -26,7 +26,7 @@ const knownDomains = [
   "veja-store.com", "rains.com", "bombas.com", "allsbirds.com", "sephora.com", "ulta.com",
   "glossier.com", "fentybeauty.com", "kyliecosmetics.com", "rarebeauty.com", "patmcgrath.com",
   "zalora.com", "myntra.com", "ajio.com", "nykaa.com", "asos.co.uk", "boohooman.com",
-  "aboutyou.com", "asos.de", "asos.fr", "asos.com.au","clarks.com","sezane.com","prettylittlething.us"
+  "aboutyou.com", "asos.de", "asos.fr", "asos.com.au","clarks.com","sezane.com","prettylittlething.us","colourpop.com","anthropologie.com","jellycat.com"
 ];
 
 
@@ -65,7 +65,7 @@ function createPopupImage(filename, options = {}) {
     position: "fixed",
     left: options.left || "20px",
     top: options.top || "20px",
-    width: options.width || "200px",
+    width: options.width || "100px",
     height: "auto",
     opacity: "0",
     borderRadius: "8px",
@@ -104,7 +104,7 @@ function showTemporaryTBImage(index) {
   }
 
   activeTBImage = createPopupImage(tbFile, {
-    width: "266px", // proportional to 596x436 vs 447x316
+    width: "133px", // proportional to 596x436 vs 447x316
     zIndex: "10000",
     opacity: 0.9
   });
@@ -127,14 +127,14 @@ if (isShoppingSite()) {
   currentImageIndex = isNaN(savedIndex) ? 0 : Math.min(savedIndex, baseImages.length - 1);
 
   const initialTitle = getItemTitle();
-  activeImageElement = createPopupImage(baseImages[currentImageIndex], { width: "200px" });
+  activeImageElement = createPopupImage(baseImages[currentImageIndex], { width: "100px" });
   console.log("Restored image:", baseImages[currentImageIndex]);
 }
 
 // --- Click handling ---
 document.addEventListener("click", (e) => {
   if (!isShoppingSite()) return;
-
+   //solution for detecting closest button is from chatgpt, befoe i was having issues when div objects were layered
   const button = e.target.closest("button, a");
   if (!button) return;
 
@@ -144,7 +144,7 @@ document.addEventListener("click", (e) => {
 
   const addKeywords = ["add to cart", "add to bag", "buy now", "purchase", "add", "shop now", "order now", "+"];
   const removeKeywords = ["remove", "minus", "-"];
-
+   //format for how to detect aria text is from chatGPT. Initially, I was looking it up based on content of the button text
   const isAdd = addKeywords.some(word => text.includes(word) || aria.includes(word) || classes.includes(word));
   const isRemove = removeKeywords.some(word => text.includes(word) || aria.includes(word) || classes.includes(word));
 
