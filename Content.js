@@ -1,5 +1,5 @@
 const knownDomains = [
-  "hm.com", "zara.com", "uniqlo.com", "gap.com", "oldnavy.com", "oldnavy.gap.com",
+   "hm.com", "zara.com", "uniqlo.com", "gap.com", "oldnavy.com", "oldnavy.gap.com",
   "target.com", "walmart.com", "kohls.com", "macys.com", "jcpenney.com",
   "nordstrom.com", "bloomingdales.com", "urbanoutfitters.com", "forever21.com",
   "express.com", "jcrew.com", "abercrombie.com", "aeropostale.com", "bananaRepublic.com",
@@ -29,93 +29,10 @@ const knownDomains = [
   "aboutyou.com", "asos.de", "asos.fr", "asos.com.au","clarks.com","sezane.com","prettylittlething.us"
 ];
 
-const categories = {
-  clothing: [
-    "shirt", "tshirt", "tee", "top", "blouse", "tank", "crop", "hoodie",
-    "sweatshirt", "sweater", "jumper", "cardigan", "jacket", "coat",
-    "blazer", "vest", "dress", "skirt", "shorts", "jeans", "pants",
-    "trousers", "leggings", "joggers", "suit", "romper", "jumpsuit",
-    "onesie", "bodysuit", "pajamas", "sleepwear", "robe", "kimono",
-    "uniform", "tracksuit", "activewear", "workout", "athleisure",
-    "swimwear", "bikini", "swimsuit", "coverup", "raincoat"
-  ],
-  shoes: [
-    "shoe", "sneaker", "trainer", "boot", "heel", "flat", "loafer",
-    "oxford", "moccasin", "sandal", "flipflop", "slipper", "wedge",
-    "cleat", "espadrille", "clog", "platform", "derby", "running shoe",
-    "trail shoe", "soccer shoe", "basketball shoe", "skate shoe"
-  ],
-  bag: [
-    "bag", "backpack", "tote", "crossbody", "handbag", "purse",
-    "satchel", "duffel", "briefcase", "messenger", "clutch",
-    "fannypack", "beltbag", "weekender", "carryon",
-    "luggage", "suitcase", "travel bag", "drawstring", "pack"
-  ],
-  accessories: [
-    "hat", "cap", "beanie", "scarf", "belt", "glove", "mittens",
-    "tie", "bowtie", "headband", "hairclip", "barrette", "bandana",
-    "watch", "bracelet", "necklace", "ring", "earring", "sunglasses",
-    "goggles", "keychain", "umbrella"
-  ],
-  jewelry: [
-    "ring", "necklace", "bracelet", "earring", "anklet", "brooch",
-    "pendant", "choker", "bangle", "chain", "cufflink"
-  ],
-  beauty: [
-    "makeup", "lipstick", "mascara", "eyeliner", "foundation",
-    "blush", "concealer", "powder", "perfume", "cologne", "fragrance",
-    "nail polish", "skincare", "cleanser", "moisturizer", "serum",
-    "haircare", "shampoo", "conditioner", "hairbrush", "dryer"
-  ],
-  toy: [
-    "toy", "lego", "doll", "stuffed", "teddy", "playset", "puzzle",
-    "boardgame", "game", "figure", "action figure", "car", "train",
-    "blocks", "educational toy", "model", "ball", "yo-yo"
-  ],
-  home: [
-    "blanket", "pillow", "bedding", "sheet", "towel", "curtain",
-    "rug", "lamp", "furniture", "chair", "table", "candle", "decor",
-    "mirror", "vase", "clock", "storage", "basket"
-  ],
-  tech: [
-    "phone case", "laptop sleeve", "charger", "headphones",
-    "earbuds", "smartwatch", "airpods", "tablet case"
-  ]
-};
-
-function flashMessage(text = "Emissions noted") {
-  const msg = document.createElement("div");
-  msg.textContent = text;
-  Object.assign(msg.style, {
-    position: "fixed",
-    top: "30%", left: "50%",
-    transform: "translate(-50%, -50%)",
-    background: "rgba(0, 0, 0, 0.8)", color: "white",
-    padding: "16px 32px", borderRadius: "8px",
-    fontSize: "20px", fontWeight: "bold",
-    zIndex: "10000", opacity: "0", transition: "opacity 0.5s",
-    pointerEvents: "none"
-  });
-  document.body.appendChild(msg);
-  requestAnimationFrame(() => msg.style.opacity = "1");
-  setTimeout(() => msg.style.opacity = "0", 5000);
-  setTimeout(() => msg.remove(), 1300);
-}
 
 function isShoppingSite() {
   return knownDomains.some(domain => location.hostname.includes(domain));
 }
-
-function detectCategory(title) {
-  title = title.toLowerCase();
-  for (const [category, keywords] of Object.entries(categories)) {
-    if (keywords.some(k => title.includes(k))) {
-      return category;
-    }
-  }
-  return "unknown";
-}
-
 
 function getItemTitle() {
   const titleEl = document.querySelector(
@@ -124,68 +41,97 @@ function getItemTitle() {
   return titleEl ? titleEl.textContent.trim() : document.title;
 }
 
+// --- Image sets ---
+const baseImages = [
+  "ems0.png","ems1.png","ems2.png","ems3.png","ems4.png",
+  "ems5.png","ems6.png","ems7.png","ems8.png","ems9.png","ems10.png"
+];
+const tbImages = [
+  "ems1_tb.png","ems2_tb.png","ems3_tb.png","ems4_tb.png",
+  "ems5_tb.png","ems6_tb.png","ems7_tb.png","ems8_tb.png",
+  "ems9_tb.png","ems10_tb.png"
+];
+
+let currentImageIndex = 0;
+let activeImageElement = null;
+let activeTBImage = null;
+
+// --- Create popup image ---
 function createPopupImage(filename, options = {}) {
   const img = document.createElement("img");
   img.src = chrome.runtime.getURL(filename);
 
   Object.assign(img.style, {
-    width: options.width || "100px",
-    height: "auto",
+    position: "fixed",
     left: options.left || "20px",
     top: options.top || "20px",
-    opacity: options.opacity || "0.8",
-    position: "fixed",
+    width: options.width || "200px",
+    height: "auto",
+    opacity: "0",
     borderRadius: "8px",
-    zIndex: "9999",
+    zIndex: options.zIndex || "9999",
     pointerEvents: "none",
     transition: "opacity 0.6s ease"
   });
 
-  img.onload = () => requestAnimationFrame(() => img.style.opacity = options.opacity || "0.8");
-  img.onerror = () => console.warn("Image failed to load:", img.src);
-
   document.body.appendChild(img);
+  requestAnimationFrame(() => img.style.opacity = options.opacity || "0.8");
   return img;
 }
 
+// --- Show main image ---
 function updateDisplayedImage() {
-  const chosenImage = imageFiles[currentImageIndex];
+  const chosenImage = baseImages[currentImageIndex];
 
-  // Remove fade-out behavior — only replace if needed
-  if (activeImageElement) {
-    activeImageElement.src = chrome.runtime.getURL(chosenImage);
-    activeImageElement.style.opacity = "0.8"; // ensure it's visible
+  if (!activeImageElement) {
+    activeImageElement = createPopupImage(chosenImage, { width: "200px" });
   } else {
-    activeImageElement = createPopupImage(chosenImage, {
-      left: "20px",
-      top: "20px",
-      opacity: 0.8
-    });
+    activeImageElement.src = chrome.runtime.getURL(chosenImage);
   }
 
-  // Persist image index
   localStorage.setItem("currentImageIndex", currentImageIndex);
+  showTemporaryTBImage(currentImageIndex);
 }
 
-const imageFiles = ["ems0.png","ems1.png", "ems2.png", "ems3.png", "ems4.png", "ems5.png", "ems6.png", "ems7.png","ems8.png","ems9.png","ems10.png"];
-let currentImageIndex = 0;
-let activeImageElement = null;
+// --- Show temporary TB overlay ---
+function showTemporaryTBImage(index) {
+  const tbFile = tbImages[index - 1];
+  if (!tbFile) return;
 
-// Initialize on load
+  if (activeTBImage) {
+    activeTBImage.remove();
+    activeTBImage = null;
+  }
+
+  activeTBImage = createPopupImage(tbFile, {
+    width: "266px", // proportional to 596x436 vs 447x316
+    zIndex: "10000",
+    opacity: 0.9
+  });
+
+  // Fade out after 5 seconds
+  setTimeout(() => {
+    activeTBImage.style.opacity = "0";
+    setTimeout(() => {
+      if (activeTBImage) {
+        activeTBImage.remove();
+        activeTBImage = null;
+      }
+    }, 600);
+  }, 5000);
+}
+
+// --- Initialize on load ---
 if (isShoppingSite()) {
   const savedIndex = parseInt(localStorage.getItem("currentImageIndex"), 10);
-  currentImageIndex = isNaN(savedIndex) ? 0 : Math.min(savedIndex, imageFiles.length - 1);
+  currentImageIndex = isNaN(savedIndex) ? 0 : Math.min(savedIndex, baseImages.length - 1);
 
   const initialTitle = getItemTitle();
-  const initialCategory = detectCategory(initialTitle);
-
-  activeImageElement = createPopupImage(imageFiles[currentImageIndex]);
-
-  console.log("Detected category:", initialCategory);
-  console.log("Restored image:", imageFiles[currentImageIndex]);
+  activeImageElement = createPopupImage(baseImages[currentImageIndex], { width: "200px" });
+  console.log("Restored image:", baseImages[currentImageIndex]);
 }
 
-// Handle clicks
+// --- Click handling ---
 document.addEventListener("click", (e) => {
   if (!isShoppingSite()) return;
 
@@ -203,9 +149,8 @@ document.addEventListener("click", (e) => {
   const isRemove = removeKeywords.some(word => text.includes(word) || aria.includes(word) || classes.includes(word));
 
   if (isAdd) {
-    currentImageIndex = Math.min(currentImageIndex + 1, imageFiles.length - 1);
+    currentImageIndex = Math.min(currentImageIndex + 1, baseImages.length - 1);
     updateDisplayedImage();
-    flashMessage();
   } else if (isRemove) {
     currentImageIndex = Math.max(currentImageIndex - 1, 0);
     updateDisplayedImage();
